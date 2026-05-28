@@ -17,22 +17,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
 
   final List<Map<String, String>> _onboardingData = [
     {
-      'title': 'Intelligence Artificielle',
-      'subtitle': 'DÉTECTION INSTANTANÉE',
-      'desc': 'Prenez une simple photo de vos feuilles de bananier et laissez notre IA identifier immédiatement les pathologies végétales.',
-      'icon': '🔍',
+      'title': 'Analyse Multi-Organes',
+      'subtitle': 'DÉTECTION PAR IA',
+      'desc': 'Prenez en photo les feuilles, les fruits, la tige ou les racines de vos bananiers pour détecter instantanément s\'ils sont sains ou malades.',
+      'icon': '🍌',
     },
     {
-      'title': 'Suivi Épidémiologique',
-      'subtitle': 'SURVEILLANCE PHYTOSANITAIRE',
-      'desc': 'Visualisez les indicateurs de santé généraux de votre bananeraie pour agir avant la propagation.',
+      'title': 'Suivi Phytosanitaire',
+      'subtitle': 'SURVEILLANCE ÉPIDÉMIOLOGIQUE',
+      'desc': 'Conservez l\'historique de vos diagnostics pour suivre l\'évolution de la santé de vos bananeraies au fil du temps.',
       'icon': '📊',
     },
     {
       'title': 'Souveraineté Agricole',
       'subtitle': 'PROTÉGEZ VOS RENDEMENTS',
-      'desc': 'Suivez l\'évolution de vos diagnostics, conservez votre historique et sécurisez vos récoltes.',
-      'icon': '🌱',
+      'desc': 'Prenez des décisions éclairées et protégez vos cultures grâce à nos prédictions IA en temps réel.',
+      'icon': '🛡️',
     },
   ];
 
@@ -73,19 +73,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                    Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primary.withOpacity(0.15),
-                        width: 1,
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.spa_rounded,
-                      color: AppColors.primary,
-                      size: 24,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),

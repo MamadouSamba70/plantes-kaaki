@@ -195,19 +195,25 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
           // Header / Icon
           Center(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.primary.withOpacity(0.15),
-                  width: 1.5,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: const Icon(
-                Icons.spa_rounded,
-                size: 36,
-                color: AppColors.primary,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
