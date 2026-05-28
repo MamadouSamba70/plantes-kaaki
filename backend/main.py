@@ -186,12 +186,20 @@ async def perform_scan(
     # Read image contents
     contents = await image.read()
     
+    # Analyze image using classifier model
+    disease, confidence, severity = classifier.predict_image(contents)
+    
+    # Validate image is a banana culture (checks for humans, other plants, etc.)
+    is_valid, err_msg = classifier.validate_banana_image(contents, confidence)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=err_msg
+        )
+        
     # Save image file locally
     with open(file_path, "wb") as f:
         f.write(contents)
-        
-    # Analyze image using classifier model
-    disease, confidence, severity = classifier.predict_image(contents)
     
     # Create web accessible image URL
     image_url = f"/uploads/{file_name}"
