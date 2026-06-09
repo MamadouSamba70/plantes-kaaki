@@ -6,7 +6,10 @@ import '../screens/splash/splash_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
 import '../screens/admin/superadmin_dashboard.dart';
+import '../screens/agronomist/agronomist_dashboard.dart';
+import '../screens/researcher/researcher_dashboard.dart';
 import '../screens/home/dashboard_screen.dart';
 import '../screens/scan/scan_screen.dart';
 import '../screens/result/result_screen.dart';
@@ -33,11 +36,27 @@ final GoRouter appRouter = GoRouter(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
 
     // ── SuperAdmin ───────────────────────────────────────────────────────────
     GoRoute(
       path: '/admin',
       builder: (context, state) => const SuperAdminDashboard(),
+    ),
+
+    // ── Agronomist ───────────────────────────────────────────────────────────
+    GoRoute(
+      path: '/agronomy',
+      builder: (context, state) => const AgronomistDashboard(),
+    ),
+
+    // ── Researcher ───────────────────────────────────────────────────────────
+    GoRoute(
+      path: '/research',
+      builder: (context, state) => const ResearcherDashboard(),
     ),
 
     // ── User (Farmer) ────────────────────────────────────────────────────────

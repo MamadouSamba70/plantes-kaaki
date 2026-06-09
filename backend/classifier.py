@@ -8,14 +8,14 @@ import io
 
 # Define classes
 CLASSES = [
-    "Racine saine",
-    "Pourriture de la racine (Maladie)",
-    "Tige saine",
-    "Flétrissement bactérien de la tige (Maladie)",
+    "Anthracnose du fruit (Maladie)",
     "Feuille saine",
-    "Sigatoka noire de la feuille (Maladie)",
+    "Flétrissement bactérien de la tige (Maladie)",
     "Fruit sain",
-    "Anthracnose du fruit (Maladie)"
+    "Pourriture de la racine (Maladie)",
+    "Racine saine",
+    "Sigatoka noire de la feuille (Maladie)",
+    "Tige saine"
 ]
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "banana_model.pth")
@@ -86,7 +86,8 @@ def predict_image(image_bytes: bytes):
             print(f"Error during PyTorch inference: {e}. Falling back to simulation.")
     
     # --- Fallback: Simulated IA Diagnostic ---
-    # Analyze image brightness/pixels to return a stable result or choose randomly
+    # Analyze image bytes using md5 hash to return a stable result for the same photo
+    import hashlib
     diseases = [
         ("Sigatoka noire", "high"),
         ("Flétrissement bactérien", "high"),
@@ -99,8 +100,9 @@ def predict_image(image_bytes: bytes):
         ("Anthracnose du fruit", "medium")
     ]
     
-    selected = random.choice(diseases)
-    confidence = round(0.75 + random.random() * 0.22, 2)
+    h = int(hashlib.md5(image_bytes).hexdigest(), 16)
+    selected = diseases[h % len(diseases)]
+    confidence = round(0.75 + (h % 23) / 100.0, 2)
     return selected[0], confidence, selected[1]
 
 
@@ -151,6 +153,7 @@ def validate_banana_image(image_bytes: bytes, custom_confidence: float) -> tuple
         # Get top 5 predictions
         top5_prob, top5_idx = torch.topk(probabilities, 5)
         top5_classes = [cats[idx.item()].lower() for idx in top5_idx]
+        print(f"DEBUG: validate_banana_image: top5_classes={top5_classes}, probabilities={[round(p.item(), 4) for p in top5_prob]}")
         top1_class = top5_classes[0]
         
         # Check if banana is in the top 5 predictions
@@ -166,33 +169,64 @@ def validate_banana_image(image_bytes: bytes, custom_confidence: float) -> tuple
             "mouse", "phone", "street", "road", "room", "office", "classroom", "shoe", "boot"
         ]
         
-        # Whitelist of plant/vegetation/agriculture classes
-        whitelist_keywords = [
-            "banana", "leaf", "plant", "tree", "forest", "wood", "fruit", "zucchini", "squash", 
-            "cucumber", "artichoke", "cabbage", "broccoli", "cauliflower", "rapeseed", "daisy", 
-            "root", "fig", "pineapple", "lemon", "orange", "jackfruit", "corn", "acorn", "buckeye", 
-            "slipper", "coral fungus", "agaric", "gyromitra", "stinkhorn", "earthstar", "bolete", 
-            "fungus", "mushroom", "orchard", "valley", "alp", "lakeside", "hay"
+        # Blacklist of other specific plants/flowers/crops to reject immediately
+        blacklist_plants = [
+            "daisy", "rose", "tulip", "sunflower", "orchid", "dandelion", "marigold", "poppy", "lily",
+            "carnation", "cactus",
+            "lemon", "orange", "apple", "grape", "strawberry", "tomato",
+            "potato", "carrot", "onion", "garlic", "pepper", "chili", "pumpkin", "watermelon", "melon",
+            "peach", "plum", "cherry", "pear", "berry"
         ]
         
-        # 1. Reject if top class is blacklisted (human, dog, car, clothing...)
-        if any(black in top1_class for black in blacklist_keywords):
-            return False, "Veuillez mettre une photo de bananier (feuille, fruit, racine ou tige)."
+        # Expanded Whitelist of plant/vegetation/agriculture/natural classes compatible with banana parts
+        whitelist_keywords = [
+            "banana", "leaf", "plant", "tree", "forest", "fruit", "zucchini", "squash", 
+            "cucumber", "root", "jackfruit", "corn", "pineapple", "orchard", "valley",
+            "wood", "lumber", "log", "bark", "stalk", "stem", "vegetable", "hay", "straw",
+            "pot", "flowerpot", "nature", "grass", "shrub", "bush", "foliage", "cardoon",
+            "cabbage", "greenhouse", "earthstar", "fungus", "mushroom", "fern", "moss",
+            "buckeye", "chestnut"
+        ]
+        
+        # Helper to tokenize a category into words (split by spaces/commas, lowercase)
+        def get_words(cat_str):
+            return cat_str.replace(",", " ").lower().split()
             
-        # 2. Accept if banana is in top-5
+        # 1. Reject if any of the top 3 classes is blacklisted (human, dog, car, clothing...)
+        for cat in top5_classes[:3]:
+            cat_words = get_words(cat)
+            if any(black in cat_words for black in blacklist_keywords):
+                return False, "Veuillez mettre une photo de bananier (feuille, fruit, racine ou tige)."
+                
+        # 2. Reject if top class is another plant / flower / crop
+        top1_words = get_words(top1_class)
+        if any(plant in top1_words for plant in blacklist_plants):
+            return False, "L'image ne semble pas être une culture de banane. Veuillez mettre une photo de bananier."
+            
+        # 3. Accept if banana is in top-5
         if is_banana_in_top5:
             return True, ""
             
-        # 3. If it's a whitelisted plant class, check custom model confidence
-        is_plant_related = any(white in top1_class for white in whitelist_keywords)
+        # 4. Check if ANY of the top-5 classes contains a whitelisted keyword
+        is_plant_related = False
+        for cat in top5_classes:
+            cat_words = get_words(cat)
+            if any(white in cat_words for white in whitelist_keywords):
+                is_plant_related = True
+                break
+                
         if is_plant_related:
-            # If custom model is highly confident, we assume it's a banana leaf/root/stem/fruit
-            if custom_confidence >= 0.70:
+            # If custom model has decent confidence on plant-related image, we accept it
+            if custom_confidence >= 0.35:
                 return True, ""
             else:
                 return False, "L'image ne semble pas être une culture de banane. Veuillez mettre une photo de bananier."
                 
-        # 4. Otherwise, reject
+        # 5. Fallback of good confidence of custom model (as long as no strict blacklist matches)
+        if custom_confidence >= 0.50:
+            return True, ""
+            
+        # 6. Otherwise, reject
         return False, "L'image ne semble pas être une culture de banane. Veuillez mettre une photo de bananier."
         
     except Exception as e:

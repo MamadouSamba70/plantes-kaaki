@@ -16,6 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  String _selectedRole = 'farmer';
   bool _obscurePass = true;
   bool _registrationDone = false;
   late AnimationController _animCtrl;
@@ -48,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
         _nameCtrl.text.trim(),
         _emailCtrl.text.trim(),
         _passCtrl.text,
-        role: 'farmer', // Force role to farmer
+        role: _selectedRole,
       );
       if (success && mounted) {
         setState(() => _registrationDone = true);
@@ -110,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
         ),
         const SizedBox(height: 28),
         const Text(
-          'Demande envoyée ! 🎉',
+          'Demande d\'inscription reçue',
           style: TextStyle(
             fontFamily: 'Outfit',
             fontSize: 24,
@@ -119,10 +120,10 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
             letterSpacing: -0.5,
           ),
           textAlign: TextAlign.center,
-          ),
+        ),
         const SizedBox(height: 12),
         const Text(
-          'Votre compte est en attente de validation',
+          'Inscription enregistrée',
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
@@ -134,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Text(
-            'Un administrateur examinera votre demande d\'accès pour KaakiScan. Vous recevrez un accès dès que votre compte sera approuvé.',
+            'Notre équipe valide actuellement les nouveaux accès. Vous pourrez vous connecter dès que votre compte sera approuvé.',
             style: TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
@@ -266,6 +267,38 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
               'identifiant@domaine.com',
               Icons.mail_outline_rounded,
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // User Role Dropdown Selection
+          DropdownButtonFormField<String>(
+            value: _selectedRole,
+            style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+            dropdownColor: Colors.white,
+            decoration: _inputDeco(
+              'Rôle de l\'utilisateur',
+              'Sélectionnez votre rôle',
+              Icons.badge_outlined,
+            ),
+            items: const [
+              DropdownMenuItem(
+                value: 'farmer',
+                child: Text('Agriculteur (Producteur)'),
+              ),
+              DropdownMenuItem(
+                value: 'agronomist',
+                child: Text('Agronome (Expert agricole)'),
+              ),
+              DropdownMenuItem(
+                value: 'researcher',
+                child: Text('Chercheur (Scientifique)'),
+              ),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _selectedRole = val);
+              }
+            },
           ),
           const SizedBox(height: 16),
 

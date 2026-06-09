@@ -17,22 +17,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
 
   final List<Map<String, String>> _onboardingData = [
     {
-      'title': 'Analyse Multi-Organes',
-      'subtitle': 'DÉTECTION PAR IA',
-      'desc': 'Prenez en photo les feuilles, les fruits, la tige ou les racines de vos bananiers pour détecter instantanément s\'ils sont sains ou malades.',
+      'title': 'Prenez soin de vos bananiers',
+      'subtitle': 'DIAGNOSTIC TRÈS SIMPLE',
+      'desc': 'Prenez en photo une feuille, un fruit, la tige ou les racines de votre bananier. Notre système vous dit tout de suite s\'il est en bonne santé ou s\'il a besoin d\'aide.',
       'icon': '🍌',
     },
     {
-      'title': 'Suivi Phytosanitaire',
-      'subtitle': 'SURVEILLANCE ÉPIDÉMIOLOGIQUE',
-      'desc': 'Conservez l\'historique de vos diagnostics pour suivre l\'évolution de la santé de vos bananeraies au fil du temps.',
-      'icon': '📊',
+      'title': 'Gardez un œil sur vos parcelles',
+      'subtitle': 'JOURNAL DE BORD SIMPLIFIÉ',
+      'desc': 'Retrouvez tous vos diagnostics passés dans un historique simple. Idéal pour voir l\'évolution de vos cultures et en parler à un conseiller agricole.',
+      'icon': '🌱',
     },
     {
-      'title': 'Souveraineté Agricole',
-      'subtitle': 'PROTÉGEZ VOS RENDEMENTS',
-      'desc': 'Prenez des décisions éclairées et protégez vos cultures grâce à nos prédictions IA en temps réel.',
-      'icon': '🛡️',
+      'title': 'Protégez vos récoltes',
+      'subtitle': 'CONSEILS PRATIQUES DE TERRAIN',
+      'desc': 'Pour chaque anomalie détectée, nous vous proposons des solutions concrètes et naturelles pour soigner vos plants et sécuriser vos rendements.',
+      'icon': '🌾',
     },
   ];
 

@@ -106,6 +106,32 @@ class AuthService {
     return null;
   }
 
+  // ─── Update Profile ───────────────────────────────────────────────────────
+  Future<UserModel> updateProfile(String fullName, String email, {String? password}) async {
+    final Map<String, dynamic> body = {
+      'full_name': fullName.trim(),
+      'email': email.trim().toLowerCase(),
+    };
+    if (password != null && password.isNotEmpty) {
+      body['password'] = password;
+    }
+
+    final response = await ApiService.put('/api/users/profile', body);
+
+    if (response.statusCode == 200) {
+      final updatedUser = UserModel.fromMap(json.decode(response.body));
+      _currentUser = updatedUser;
+      await _persistSession(updatedUser);
+      return updatedUser;
+    } else {
+      Map<String, dynamic> errorData = {};
+      try {
+        errorData = json.decode(response.body);
+      } catch (_) {}
+      throw Exception(errorData['detail'] ?? 'Erreur lors de la mise à jour du profil.');
+    }
+  }
+
   // ─── SuperAdmin: List Pending Users ──────────────────────────────────────
   Future<List<UserModel>> getPendingUsers() async {
     final response = await ApiService.get('/api/users/pending');

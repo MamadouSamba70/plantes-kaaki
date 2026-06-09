@@ -8,7 +8,7 @@ class ApiService {
   // Default URL: 10.0.2.2 is localhost for Android Emulators.
   // For physical devices, change to your computer's IP address (e.g., http://192.168.1.100:8000)
   static const String _defaultBaseUrl = kDebugMode 
-      ? 'http://192.168.1.113:8000' 
+      ? 'http://192.168.1.111:8000' 
       : 'https://api.kaakiscan.com'; // Production URL placeholder
 
   static String _baseUrl = _defaultBaseUrl;

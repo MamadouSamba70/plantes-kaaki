@@ -6,10 +6,13 @@ from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, F
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict
 
 from database import engine, Base, get_db
 import models, schemas, auth, classifier
+
+# In-memory store for reset tokens: {token: email}
+_reset_tokens: Dict[str, str] = {}
 
 # Initialize Database tables
 Base.metadata.create_all(bind=engine)
@@ -109,10 +112,79 @@ def login(form_data: schemas.UserLogin, db: Session = Depends(get_db)):
         
     access_token = auth.create_access_token(data={"sub": user.email})
     return {
-        "access_token": access_token, 
+        "access_token": access_token,
         "token_type": "bearer",
         "user": user
     }
+
+
+# ─── Password Reset Routes ────────────────────────────────────────────────────
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(data: schemas.PasswordResetRequest, db: Session = Depends(get_db)):
+    """Generate a reset token for the given email. Always returns success to avoid email enumeration."""
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if user:
+        token = uuid.uuid4().hex
+        _reset_tokens[token] = data.email
+        # In production, send token by email. For now, return it in response for dev use.
+        print(f"[DEV] Password reset token for {data.email}: {token}")
+        return {"message": "Un code de réinitialisation a été généré.", "dev_token": token}
+    return {"message": "Si cet e-mail est enregistré, un code vous sera transmis via votre administrateur."}
+
+
+@app.post("/api/auth/reset-password")
+def reset_password(data: schemas.PasswordResetConfirm, db: Session = Depends(get_db)):
+    """Consume a reset token and update the user's password."""
+    email = _reset_tokens.get(data.token)
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Code de réinitialisation invalide ou expiré."
+        )
+    if len(data.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Le nouveau mot de passe doit comporter au moins 6 caractères."
+        )
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+    user.hashed_password = auth.get_password_hash(data.new_password)
+    db.commit()
+    del _reset_tokens[data.token]  # invalidate token after use
+    return {"message": "Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter."}
+
+
+@app.put("/api/users/profile", response_model=schemas.UserOut)
+def update_profile(
+    profile_data: schemas.UserUpdateProfile,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    if profile_data.email and profile_data.email.strip().lower() != current_user.email.lower():
+        existing_user = db.query(models.User).filter(models.User.email == profile_data.email.strip().lower()).first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Un compte existe déjà avec cet e-mail."
+            )
+        current_user.email = profile_data.email.strip().lower()
+        
+    if profile_data.full_name is not None and profile_data.full_name.strip():
+        current_user.full_name = profile_data.full_name.strip()
+        
+    if profile_data.password is not None and profile_data.password:
+        if len(profile_data.password) < 6:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Le mot de passe doit comporter au moins 6 caractères."
+            )
+        current_user.hashed_password = auth.get_password_hash(profile_data.password)
+        
+    db.commit()
+    db.refresh(current_user)
+    return current_user
 
 
 # ─── Admin/SuperAdmin Routes ──────────────────────────────────────────────────

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Roles: farmer, agronomist, researcher, superadmin
 class UserModel {
@@ -49,11 +48,18 @@ class UserModel {
   /// Helper getters
   bool get isSuperAdmin => role == 'superadmin';
   bool get isFarmer => role == 'farmer';
+  bool get isAgronomist => role == 'agronomist';
+  bool get isResearcher => role == 'researcher';
 
   String get roleLabel {
     switch (role) {
       case 'superadmin':
         return 'Administrateur';
+      case 'agronomist':
+        return 'Agronome';
+      case 'researcher':
+        return 'Chercheur';
+      case 'farmer':
       default:
         return 'Agriculteur';
     }
@@ -63,6 +69,11 @@ class UserModel {
     switch (role) {
       case 'superadmin':
         return '🛡️';
+      case 'agronomist':
+        return '🧑‍🌾';
+      case 'researcher':
+        return '🔬';
+      case 'farmer':
       default:
         return '🌾';
     }

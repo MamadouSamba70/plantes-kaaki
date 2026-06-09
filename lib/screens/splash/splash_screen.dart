@@ -51,8 +51,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (authProvider.isAuthenticated) {
-      if (authProvider.user?.isSuperAdmin == true) {
+      final user = authProvider.user;
+      if (user?.isSuperAdmin == true) {
         context.go('/admin');
+      } else if (user?.isAgronomist == true) {
+        context.go('/agronomy');
+      } else if (user?.isResearcher == true) {
+        context.go('/research');
       } else {
         context.go('/home');
       }

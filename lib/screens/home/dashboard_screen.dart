@@ -36,6 +36,14 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
           context.go('/admin');
           return;
         }
+        if (authProvider.user!.isAgronomist) {
+          context.go('/agronomy');
+          return;
+        }
+        if (authProvider.user!.isResearcher) {
+          context.go('/research');
+          return;
+        }
         Provider.of<ScanProvider>(context, listen: false)
             .fetchHistory(authProvider.user!.uid);
       }

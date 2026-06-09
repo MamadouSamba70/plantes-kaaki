@@ -280,14 +280,45 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       const SizedBox(height: 24),
 
                       // Technical Info section
-                      const Text(
-                        'Informations du compte ⚙️',
-                        style: TextStyle(
-                          fontFamily: 'Outfit',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Informations du compte ⚙️',
+                            style: TextStyle(
+                              fontFamily: 'Outfit',
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => _showEditProfileDialog(context, authProvider),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F3E12).withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFF0F3E12).withOpacity(0.15)),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.edit_rounded, size: 14, color: Color(0xFF0F3E12)),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Modifier',
+                                    style: TextStyle(
+                                      fontFamily: 'Outfit',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F3E12),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -316,7 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                               title: 'Mode de connexion',
                               value: authProvider.isMockMode
                                   ? 'Mode Démo (Local)'
-                                  : 'Connecté au cloud Firebase',
+                                  : 'Base de données SQLite',
                               valueColor: authProvider.isMockMode ? AppColors.warning : AppColors.success,
                             ),
                             const Divider(height: 1, indent: 56, endIndent: 16),
@@ -469,6 +500,209 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ),
         ],
       ),
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context, AuthProvider authProvider) {
+    final user = authProvider.user;
+    if (user == null) return;
+
+    final nameController = TextEditingController(text: user.fullName);
+    final emailController = TextEditingController(text: user.email);
+    final passwordController = TextEditingController();
+    bool isSaving = false;
+    String? dialogError;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: const Row(
+                children: [
+                  Icon(Icons.person_outline_rounded, color: Color(0xFF0F3E12)),
+                  SizedBox(width: 10),
+                  Text(
+                    'Modifier mon profil',
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color(0xFF0F3E12),
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (dialogError != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.danger.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.danger.withOpacity(0.15)),
+                        ),
+                        child: Text(
+                          dialogError!,
+                          style: const TextStyle(color: AppColors.danger, fontSize: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    const Text(
+                      'Nom complet',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        hintText: 'Fatima Abdul Sow',
+                        prefixIcon: const Icon(Icons.person_rounded, size: 20),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFF0F3E12), width: 1.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Adresse e-mail',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        hintText: 'email@gmail.com',
+                        prefixIcon: const Icon(Icons.email_rounded, size: 20),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFF0F3E12), width: 1.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Nouveau mot de passe (optionnel)',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: 'Laisser vide pour ne pas changer',
+                        prefixIcon: const Icon(Icons.lock_rounded, size: 20),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFF0F3E12), width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              actions: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: isSaving ? null : () => Navigator.pop(ctx),
+                        child: const Text(
+                          'Annuler',
+                          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F3E12),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: isSaving
+                            ? null
+                            : () async {
+                                if (nameController.text.trim().isEmpty) {
+                                  setState(() => dialogError = 'Le nom ne peut pas être vide.');
+                                  return;
+                                }
+                                if (emailController.text.trim().isEmpty) {
+                                  setState(() => dialogError = 'L\'adresse e-mail ne peut pas être vide.');
+                                  return;
+                                }
+
+                                setState(() {
+                                  isSaving = true;
+                                  dialogError = null;
+                                });
+
+                                final success = await authProvider.updateProfile(
+                                  nameController.text.trim(),
+                                  emailController.text.trim(),
+                                  password: passwordController.text.isNotEmpty ? passwordController.text : null,
+                                );
+
+                                if (success) {
+                                  if (context.mounted) {
+                                    Navigator.pop(ctx);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text('Profil mis à jour avec succès.'),
+                                        backgroundColor: const Color(0xFF0F3E12),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  setState(() {
+                                    isSaving = false;
+                                    dialogError = authProvider.errorMessage ?? 'Une erreur est survenue.';
+                                  });
+                                }
+                              },
+                        child: isSaving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text('Enregistrer', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

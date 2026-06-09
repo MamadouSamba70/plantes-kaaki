@@ -46,8 +46,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         _passCtrl.text,
       );
       if (success && mounted) {
-        if (authProvider.user?.isSuperAdmin == true) {
+        final user = authProvider.user;
+        if (user?.isSuperAdmin == true) {
           context.go('/admin');
+        } else if (user?.isAgronomist == true) {
+          context.go('/agronomy');
+        } else if (user?.isResearcher == true) {
+          context.go('/research');
         } else {
           context.go('/home');
         }
@@ -141,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Système intelligent de surveillance épidémiologique',
+                        'L\'allié santé de vos plantations de bananiers',
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -190,7 +195,25 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 10),
+
+                      // Forgot Password Link
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () => context.go('/forgot-password'),
+                          child: const Text(
+                            'Mot de passe oublié ?',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
 
                       // Animated Error Banner
                       if (auth.errorMessage != null) ...[

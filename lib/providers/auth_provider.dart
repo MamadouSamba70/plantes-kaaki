@@ -97,6 +97,25 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // ─── Update Profile ────────────────────────────────────────────────────────
+  Future<bool> updateProfile(String fullName, String email, {String? password}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _user = await _authService.updateProfile(fullName, email, password: password);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // ─── SuperAdmin Methods ────────────────────────────────────────────────────
   Future<List<UserModel>> getPendingUsers() async {
     return await _authService.getPendingUsers();
