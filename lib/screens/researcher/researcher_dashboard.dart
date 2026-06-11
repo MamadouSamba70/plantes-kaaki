@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
+import '../../core/utils/file_saver.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/scan_provider.dart';
 import '../../models/scan.dart';
@@ -48,22 +49,39 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
     return buffer.toString();
   }
 
-  // Generate JSON from history list
+  // Generate JSON from history list (proper JSON format)
   String _generateJSON(List<ScanModel> scans) {
-    List<Map<String, dynamic>> list = scans.map((s) => s.toMap()).toList();
-    return list.toString(); // simplified printable representation
+    final List<Map<String, dynamic>> list = scans.map((s) => s.toMap()).toList();
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(list);
   }
 
-  void _exportData(String type, String content) {
-    Clipboard.setData(ClipboardData(text: content));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Données exportées au format $type et copiées dans le presse-papiers ! 📊'),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+  Future<void> _exportData(String type, String content, List<ScanModel> scans) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final extension = type.toLowerCase();
+      final fileName = 'kaakiscan_diagnostics_$timestamp.$extension';
+      final mimeType = type == 'CSV' ? 'text/csv' : 'application/json';
+
+      await saveAndShareFile(
+        fileName,
+        content,
+        mimeType,
+        subject: 'KaakiScan — Export épidémiologique ($type) — ${scans.length} diagnostics',
+        text: 'Export généré par KaakiScan le ${DateTime.now().toLocal().toString().substring(0, 16)}',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de l\'export : $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -102,7 +120,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Dr. ${user?.fullName.split(' ').first ?? 'Chercheur'} 🔬',
+                            'Dr. ${user?.fullName.split(' ').first ?? 'Chercheur'}',
                             style: const TextStyle(
                               fontFamily: 'Outfit',
                               fontSize: 22,
@@ -135,7 +153,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
 
                   // Model Specs Zone
                   const Text(
-                    'Spécifications du Modèle MobileNetV2 🧑‍💻',
+                    'Spécifications du Modèle MobileNetV2',
                     style: TextStyle(
                       fontFamily: 'Outfit',
                       fontSize: 15,
@@ -149,7 +167,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
 
                   // Data Export Section
                   const Text(
-                    'Exportation de données épidémiologiques 📥',
+                    'Exportation de données épidémiologiques',
                     style: TextStyle(
                       fontFamily: 'Outfit',
                       fontSize: 15,
@@ -188,7 +206,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
                                 label: const Text('Export CSV', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                                 onPressed: total == 0 ? null : () {
                                   final csv = _generateCSV(scans);
-                                  _exportData('CSV', csv);
+                                  _exportData('CSV', csv, scans);
                                 },
                               ),
                             ),
@@ -207,7 +225,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
                                 label: const Text('Export JSON', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                                 onPressed: total == 0 ? null : () {
                                   final jsonStr = _generateJSON(scans);
-                                  _exportData('JSON', jsonStr);
+                                  _exportData('JSON', jsonStr, scans);
                                 },
                               ),
                             ),
@@ -223,7 +241,7 @@ class _ResearcherDashboardState extends State<ResearcherDashboard> with SingleTi
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Registre global des diagnostics 📊',
+                        'Registre global des diagnostics',
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontSize: 15,

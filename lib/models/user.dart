@@ -65,19 +65,7 @@ class UserModel {
     }
   }
 
-  String get roleIcon {
-    switch (role) {
-      case 'superadmin':
-        return '🛡️';
-      case 'agronomist':
-        return '🧑‍🌾';
-      case 'researcher':
-        return '🔬';
-      case 'farmer':
-      default:
-        return '🌾';
-    }
-  }
+  String get roleIcon => '';
 
   UserModel copyWith({bool? isApproved, String? role}) {
     return UserModel(

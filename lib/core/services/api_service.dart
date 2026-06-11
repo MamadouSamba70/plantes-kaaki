@@ -3,27 +3,53 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'server_discovery.dart';
 
 class ApiService {
-  // Default URL: 10.0.2.2 is localhost for Android Emulators.
-  // For physical devices, change to your computer's IP address (e.g., http://192.168.1.100:8000)
-  static const String _defaultBaseUrl = kDebugMode 
-      ? 'http://192.168.1.111:8000' 
-      : 'https://api.kaakiscan.com'; // Production URL placeholder
+  // URL dynamique : découverte automatique sur le réseau local.
+  // En production, pointe vers le vrai serveur.
+  static const String _productionUrl = 'https://api.kaakiscan.com';
 
-  static String _baseUrl = _defaultBaseUrl;
+  // IP de secours du PC de développement (Wi-Fi actuel).
+  // Utilisée immédiatement avant que la découverte ne termine.
+  static const String _fallbackDevUrl = 'http://10.13.226.15:8000';
+
+  static String _baseUrl = kDebugMode ? _fallbackDevUrl : _productionUrl;
   static String? _token;
 
   static String get baseUrl => _baseUrl;
-  
+
+  /// Callback optionnel pour afficher l'état de la découverte dans l'UI.
+  static void Function(String)? onDiscoveryStatus;
+
   static void setBaseUrl(String newUrl) {
     _baseUrl = newUrl;
   }
 
-  // Load token from local storage
-  static Future<void> init() async {
+  // Initialise le service : charge le token ET découvre le serveur si besoin
+  static Future<void> init({void Function(String)? onStatus}) async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('api_jwt_token');
+
+    // En mode développement, découverte automatique du serveur
+    if (kDebugMode) {
+      if (kIsWeb) {
+        // Sur le Web, on utilise le même hôte que l'application mais sur le port 8000
+        final host = Uri.base.host;
+        _baseUrl = 'http://$host:8000';
+        onStatus?.call('Serveur Web résolu : $_baseUrl');
+      } else {
+        final found = await ServerDiscovery.discover(
+          onStatus: onStatus ?? onDiscoveryStatus,
+        );
+        if (found != null) {
+          _baseUrl = found;
+        }
+        // Si found == null (ne devrait pas arriver avec le fallback dans ServerDiscovery),
+        // _baseUrl reste à _fallbackDevUrl définie ci-dessus.
+        onStatus?.call('Backend connecté : $_baseUrl');
+      }
+    }
   }
 
   static bool get isAuthenticated => _token != null;

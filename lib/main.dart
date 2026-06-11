@@ -6,14 +6,9 @@ import 'providers/auth_provider.dart';
 import 'providers/scan_provider.dart';
 import 'routes/router.dart';
 
-import 'core/services/api_service.dart';
-
 void main() async {
   // Ensure widget binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize HTTP API Service (loads local token)
-  await ApiService.init();
 
   // Safe Firebase Initialization
   // If configuration files (google-services.json / GoogleService-Info.plist) are missing,

@@ -15,24 +15,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
   late AnimationController _animCtrl;
   late Animation<double> _fadeIn;
 
-  final List<Map<String, String>> _onboardingData = [
+  final List<Map<String, dynamic>> _onboardingData = [
     {
       'title': 'Prenez soin de vos bananiers',
       'subtitle': 'DIAGNOSTIC TRÈS SIMPLE',
       'desc': 'Prenez en photo une feuille, un fruit, la tige ou les racines de votre bananier. Notre système vous dit tout de suite s\'il est en bonne santé ou s\'il a besoin d\'aide.',
-      'icon': '🍌',
+      'icon': Icons.camera_alt_rounded,
     },
     {
       'title': 'Gardez un œil sur vos parcelles',
       'subtitle': 'JOURNAL DE BORD SIMPLIFIÉ',
       'desc': 'Retrouvez tous vos diagnostics passés dans un historique simple. Idéal pour voir l\'évolution de vos cultures et en parler à un conseiller agricole.',
-      'icon': '🌱',
+      'icon': Icons.history_rounded,
     },
     {
       'title': 'Protégez vos récoltes',
       'subtitle': 'CONSEILS PRATIQUES DE TERRAIN',
       'desc': 'Pour chaque anomalie détectée, nous vous proposons des solutions concrètes et naturelles pour soigner vos plants et sécuriser vos rendements.',
-      'icon': '🌾',
+      'icon': Icons.shield_rounded,
     },
   ];
 
@@ -151,9 +151,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                               ],
                             ),
                             child: Center(
-                              child: Text(
-                                item['icon']!,
-                                style: TextStyle(fontSize: isCompact ? 40 : 54),
+                              child: Icon(
+                                item['icon'] as IconData,
+                                size: isCompact ? 44 : 58,
+                                color: AppColors.primary,
                               ),
                             ),
                           ),

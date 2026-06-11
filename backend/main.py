@@ -33,6 +33,11 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
+# Health-check endpoint for automatic network discovery
+@app.get("/api/ping")
+def ping():
+    return {"status": "ok", "service": "KaakiScan"}
+
 # Auto-seed the SuperAdmin user
 @app.on_event("startup")
 def seed_superadmin():
@@ -96,6 +101,22 @@ def register(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/api/login", response_model=schemas.Token)
 def login(form_data: schemas.UserLogin, db: Session = Depends(get_db)):
+    # Debug logging
+    try:
+        with open("login_attempts.log", "a", encoding="utf-8") as log_file:
+            import datetime
+            now = datetime.datetime.now().isoformat()
+            log_file.write(f"[{now}] Login attempt - Email: '{form_data.email}', Password Length: {len(form_data.password)}\n")
+            
+            user = db.query(models.User).filter(models.User.email == form_data.email).first()
+            if not user:
+                log_file.write(f"[{now}] User not found in DB.\n")
+            else:
+                pw_matches = auth.verify_password(form_data.password, user.hashed_password)
+                log_file.write(f"[{now}] User found. Role: {user.role}, Approved: {user.is_approved}, PW Matches: {pw_matches}\n")
+    except Exception as log_err:
+        print(f"Logging error: {log_err}")
+
     user = db.query(models.User).filter(models.User.email == form_data.email).first()
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(

@@ -265,7 +265,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('🗑️ Diagnostic supprimé avec succès.'),
+              content: const Text('Diagnostic supprimé avec succès.'),
               backgroundColor: AppColors.textPrimary,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

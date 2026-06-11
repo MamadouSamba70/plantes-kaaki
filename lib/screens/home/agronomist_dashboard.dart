@@ -46,7 +46,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> {
 
     // Role dynamic definitions
     final isResearcher = user?.role?.toLowerCase() == 'researcher';
-    final expertTitle = isResearcher ? 'Chercheur Botanique 🧬' : 'Expert Agronome 🔬';
+    final expertTitle = isResearcher ? 'Chercheur Botanique' : 'Expert Agronome';
     final expertSubtitle = isResearcher 
         ? 'Suivi de la biodiversité & innovations phytosanitaires' 
         : 'Consultation & recommandation sur les maladies du bananier';
@@ -193,7 +193,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> {
                                   const SizedBox(height: 2),
                                   Text(
                                     infestationRate == '0' 
-                                        ? 'Aucune menace détectée 🛡️' 
+                                        ? 'Aucune menace détectée' 
                                         : '$infestationRate% de cas d\'infection actifs',
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -233,7 +233,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> {
                     children: [
                       // ── Epidemiological Statistics grid ──
                       const Text(
-                        'Indicateurs épidémiologiques globaux 📊',
+                        'Indicateurs épidémiologiques globaux',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -267,7 +267,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> {
                       // ── Regional Disease Breakdown Chart ──
                       if (regionalInfections.isNotEmpty) ...[
                         const Text(
-                          'Souches identifiées dans la région 🧬',
+                          'Souches identifiées dans la région',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -307,7 +307,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Alertes phytosanitaires récentes 🚨',
+                            'Alertes phytosanitaires récentes',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

@@ -54,7 +54,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     Color roleColor = const Color(0xFF0F3E12);
     Color roleBg = const Color(0xFFE8F5E9);
     String roleLabel = 'Producteur Agricole';
-    String roleEmoji = '🍌';
     String roleQuote = 'Cultive le bananier avec amour, protège sa plantation avec intelligence.';
     List<Widget> roleStats = [];
 
@@ -63,7 +62,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         roleColor = const Color(0xFFD84315);
         roleBg = const Color(0xFFFBE9E7);
         roleLabel = 'Administrateur';
-        roleEmoji = '🛡️';
         roleQuote = 'Protecteur de KaakiScan, garant de la sécurité de la communauté.';
         roleStats = [
           _buildStatCard('Utilisateurs', 'Actifs', Icons.people_alt_rounded, roleColor),
@@ -100,7 +98,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     children: [
                       // Back button
                       GestureDetector(
-                        onTap: () => context.go('/home'),
+                        onTap: () {
+                          final role = context.read<AuthProvider>().user?.role;
+                          if (role == 'superadmin') {
+                            context.go('/admin');
+                          } else {
+                            context.go('/home');
+                          }
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -175,15 +180,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: const Color(0xFFE8EBE8)),
-                                ),
-                                child: Text(roleEmoji, style: const TextStyle(fontSize: 16)),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -250,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           icon: const Icon(Icons.admin_panel_settings_rounded),
-                          label: const Text('Panneau d\'Administration 🛡️', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text('Panneau d\'Administration', style: TextStyle(fontWeight: FontWeight.bold)),
                           onPressed: () => context.go('/admin'),
                         ),
                         const SizedBox(height: 24),
@@ -258,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
                       // Stats Section
                       const Text(
-                        'Tableau de bord 📈',
+                        'Tableau de bord',
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontSize: 15,
@@ -284,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Informations du compte ⚙️',
+                            'Informations du compte',
                             style: TextStyle(
                               fontFamily: 'Outfit',
                               fontSize: 15,
@@ -354,7 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             _buildProfileTile(
                               icon: Icons.lock_outline_rounded,
                               title: 'Statut du Compte',
-                              value: user?.isApproved == true ? 'Validé par l\'Admin ✅' : 'En attente de validation ⏳',
+                              value: user?.isApproved == true ? 'Validé par l\'Admin' : 'En attente de validation',
                               valueColor: user?.isApproved == true ? AppColors.success : AppColors.warning,
                             ),
                           ],
@@ -364,14 +360,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
                       // Help cards
                       _buildHelpCard(
-                        'Comment bien scanner une feuille ? 🍌',
+                        'Comment bien scanner une feuille ?',
                         'Prenez la photo sous une lumière naturelle et évitez les reflets sur la feuille.',
                         Icons.tips_and_updates_rounded,
                         const Color(0xFFE5A93C),
                       ),
                       const SizedBox(height: 12),
                       _buildHelpCard(
-                        'Besoin d\'un conseil agricole ? 📞',
+                        'Besoin d\'un conseil agricole ?',
                         'Contactez nos conseillers agricoles pour obtenir des recommandations personnalisées.',
                         Icons.support_agent_rounded,
                         const Color(0xFF0288D1),

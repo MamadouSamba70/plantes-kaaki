@@ -295,7 +295,7 @@ class ResultScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'À propos de cette anomalie 🔍',
+                    'À propos de cette anomalie',
                     style: TextStyle(
                       fontFamily: 'Outfit',
                       fontWeight: FontWeight.bold,
@@ -336,7 +336,7 @@ class ResultScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Traitements recommandés 🌿',
+                    'Traitements recommandés',
                     style: TextStyle(
                       fontFamily: 'Outfit',
                       fontWeight: FontWeight.bold,

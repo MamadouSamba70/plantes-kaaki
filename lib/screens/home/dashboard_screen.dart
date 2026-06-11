@@ -209,7 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
 
                 // Quick Stats Section Title
                 const Text(
-                  'Vue d\'ensemble 📈',
+                  'Vue d\'ensemble',
                   style: TextStyle(
                     fontFamily: 'Outfit',
                     fontSize: 16,
@@ -236,7 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Derniers Diagnostics 🍌',
+                      'Derniers Diagnostics',
                       style: TextStyle(
                         fontFamily: 'Outfit',
                         fontSize: 16,

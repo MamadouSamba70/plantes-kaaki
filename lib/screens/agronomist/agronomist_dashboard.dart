@@ -76,7 +76,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> with SingleTi
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Bonjour, Dr. ${user?.fullName.split(' ').first ?? 'Agronome'} 🧑‍🌾',
+                            'Bonjour, Dr. ${user?.fullName.split(' ').first ?? 'Agronome'}',
                             style: const TextStyle(
                               fontFamily: 'Outfit',
                               fontSize: 22,
@@ -180,7 +180,7 @@ class _AgronomistDashboardState extends State<AgronomistDashboard> with SingleTi
 
                   // Filter Section
                   const Text(
-                    'Diagnostics parcellaires 📂',
+                    'Diagnostics parcellaires',
                     style: TextStyle(
                       fontFamily: 'Outfit',
                       fontSize: 16,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/colors.dart';
+import '../../core/services/api_service.dart';
 import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,6 +16,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  String _statusMessage = 'Initialisation...';
+
+  void _updateStatus(String msg) {
+    if (mounted) setState(() => _statusMessage = msg);
+  }
 
   @override
   void initState() {
@@ -34,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _controller.forward();
-    _navigateToNext();
+    _initAndNavigate();
   }
 
   @override
@@ -43,13 +49,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
-  Future<void> _navigateToNext() async {
-    // Wait for the animation + auth session check
-    await Future.delayed(const Duration(milliseconds: 2500));
+  Future<void> _initAndNavigate() async {
+    // Relancer la découverte du serveur avec affichage du statut
+    await ApiService.init(onStatus: _updateStatus);
+
+    // Attendre au minimum que l'animation soit visible
+    await Future.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
     if (authProvider.isAuthenticated) {
       final user = authProvider.user;
       if (user?.isSuperAdmin == true) {
@@ -124,7 +132,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                 ),
                 const SizedBox(height: 48),
-                // Loading Indicator
                 const SizedBox(
                   width: 24,
                   height: 24,
@@ -134,11 +141,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Chargement...',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    _statusMessage,
+                    key: ValueKey(_statusMessage),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
