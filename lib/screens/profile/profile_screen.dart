@@ -69,6 +69,39 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           _buildStatCard('Mode', 'Démo', Icons.storage_rounded, roleColor),
         ];
         break;
+      case 'agronomist':
+        roleColor = const Color(0xFF0F3E12);
+        roleBg = const Color(0xFFE8F5E9);
+        roleLabel = 'Agronome';
+        roleQuote = 'Expertise et suivi phytosanitaire pour la santé végétale.';
+        roleStats = [
+          _buildStatCard('Scans', '$totalScans', Icons.science_outlined, roleColor),
+          _buildStatCard('Santé', '$healthRate%', Icons.favorite_border_rounded, healthyScans > 0 ? AppColors.success : roleColor),
+          _buildStatCard('Alertes', '$sickScans', Icons.warning_amber_rounded, sickScans > 0 ? AppColors.danger : roleColor),
+        ];
+        break;
+      case 'researcher':
+        roleColor = const Color(0xFF0F3E12);
+        roleBg = const Color(0xFFE8F5E9);
+        roleLabel = 'Chercheur';
+        roleQuote = 'Recherche scientifique et développement de solutions agricoles.';
+        roleStats = [
+          _buildStatCard('Scans', '$totalScans', Icons.biotech_outlined, roleColor),
+          _buildStatCard('Santé', '$healthRate%', Icons.favorite_border_rounded, healthyScans > 0 ? AppColors.success : roleColor),
+          _buildStatCard('Alertes', '$sickScans', Icons.warning_amber_rounded, sickScans > 0 ? AppColors.danger : roleColor),
+        ];
+        break;
+      case 'student':
+        roleColor = const Color(0xFF0F3E12);
+        roleBg = const Color(0xFFE8F5E9);
+        roleLabel = 'Étudiant';
+        roleQuote = 'Étudie la biologie végétale et le diagnostic terrain pour l\'avenir agricole.';
+        roleStats = [
+          _buildStatCard('Scans', '$totalScans', Icons.school_outlined, roleColor),
+          _buildStatCard('Santé', '$healthRate%', Icons.favorite_border_rounded, healthyScans > 0 ? AppColors.success : roleColor),
+          _buildStatCard('Alertes', '$sickScans', Icons.warning_amber_rounded, sickScans > 0 ? AppColors.danger : roleColor),
+        ];
+        break;
       case 'farmer':
       default:
         roleStats = [
@@ -102,6 +135,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                           final role = context.read<AuthProvider>().user?.role;
                           if (role == 'superadmin') {
                             context.go('/admin');
+                          } else if (role == 'agronomist') {
+                            context.go('/agronomy');
+                          } else if (role == 'researcher') {
+                            context.go('/research');
+                          } else if (role == 'student') {
+                            context.go('/student');
                           } else {
                             context.go('/home');
                           }

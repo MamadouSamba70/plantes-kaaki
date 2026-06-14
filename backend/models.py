@@ -10,7 +10,7 @@ class User(Base):
     full_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    role = Column(String, default="farmer") # farmer, agronomist, researcher, superadmin
+    role = Column(String, default="farmer") # farmer, agronomist, researcher, student, superadmin
     is_approved = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

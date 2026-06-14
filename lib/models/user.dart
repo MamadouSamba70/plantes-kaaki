@@ -50,6 +50,7 @@ class UserModel {
   bool get isFarmer => role == 'farmer';
   bool get isAgronomist => role == 'agronomist';
   bool get isResearcher => role == 'researcher';
+  bool get isStudent => role == 'student';
 
   String get roleLabel {
     switch (role) {
@@ -59,6 +60,8 @@ class UserModel {
         return 'Agronome';
       case 'researcher':
         return 'Chercheur';
+      case 'student':
+        return 'Étudiant';
       case 'farmer':
       default:
         return 'Agriculteur';

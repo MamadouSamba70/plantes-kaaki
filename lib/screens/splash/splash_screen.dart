@@ -66,6 +66,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         context.go('/agronomy');
       } else if (user?.isResearcher == true) {
         context.go('/research');
+      } else if (user?.isStudent == true) {
+        context.go('/student');
       } else {
         context.go('/home');
       }

@@ -44,6 +44,10 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
           context.go('/research');
           return;
         }
+        if (authProvider.user!.isStudent) {
+          context.go('/student');
+          return;
+        }
         Provider.of<ScanProvider>(context, listen: false)
             .fetchHistory(authProvider.user!.uid);
       }

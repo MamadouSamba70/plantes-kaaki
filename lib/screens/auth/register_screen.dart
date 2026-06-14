@@ -293,6 +293,10 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
                 value: 'researcher',
                 child: Text('Chercheur (Scientifique)'),
               ),
+              DropdownMenuItem(
+                value: 'student',
+                child: Text('Étudiant (Apprentissage)'),
+              ),
             ],
             onChanged: (val) {
               if (val != null) {

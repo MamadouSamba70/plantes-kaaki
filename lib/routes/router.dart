@@ -15,6 +15,7 @@ import '../screens/scan/scan_screen.dart';
 import '../screens/result/result_screen.dart';
 import '../screens/history/history_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/student/student_dashboard.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -57,6 +58,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/research',
       builder: (context, state) => const ResearcherDashboard(),
+    ),
+
+    // ── Student ──────────────────────────────────────────────────────────────
+    GoRoute(
+      path: '/student',
+      builder: (context, state) => const StudentDashboard(),
     ),
 
     // ── User (Farmer) ────────────────────────────────────────────────────────
